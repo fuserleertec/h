@@ -1,0 +1,1519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>TradeSniper.ai — ICT & SMC Trading Tools</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #0b0d10;
+    --surface: #111418;
+    --surface2: #171b21;
+    --border: #1f2530;
+    --border-light: #262e3a;
+    --accent: #00e5ff;
+    --accent2: #7b5cf0;
+    --accent-glow: rgba(0, 229, 255, 0.15);
+    --accent2-glow: rgba(123, 92, 240, 0.2);
+    --text: #eaf0f8;
+    --muted: #7a8796;
+    --muted2: #4a5568;
+    --green: #00d084;
+    --red: #ff4d6d;
+    --gold: #f5c842;
+    --font-head: 'Syne', sans-serif;
+    --font-body: 'DM Sans', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* ─── NOISE OVERLAY ─── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.6;
+  }
+
+  /* ─── NAV ─── */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(11,13,16,0.85);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 32px;
+    height: 60px;
+  }
+
+  .nav-logo {
+    font-family: var(--font-head);
+    font-weight: 800;
+    font-size: 18px;
+    letter-spacing: -0.5px;
+    color: var(--text);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .nav-logo span {
+    color: var(--accent);
+  }
+
+  .nav-logo .dot {
+    width: 7px; height: 7px;
+    background: var(--accent);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--accent);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.85); }
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 28px;
+    list-style: none;
+  }
+
+  .nav-links a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 13.5px;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover { color: var(--text); }
+
+  .nav-cta {
+    background: var(--accent);
+    color: #000;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 6px;
+    font-family: var(--font-head);
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    text-decoration: none;
+    letter-spacing: 0.3px;
+    transition: opacity 0.2s, transform 0.15s;
+  }
+
+  .nav-cta:hover { opacity: 0.88; transform: translateY(-1px); }
+
+  /* ─── LIVE BANNER ─── */
+  .live-banner {
+    background: linear-gradient(90deg, #00d084 0%, var(--accent) 100%);
+    color: #000;
+    text-align: center;
+    font-family: var(--font-head);
+    font-size: 12.5px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    padding: 8px 16px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .live-banner::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+    animation: shimmer 3s infinite;
+  }
+
+  @keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+
+  .live-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(0,0,0,0.15);
+    border-radius: 20px;
+    padding: 2px 10px;
+    margin-right: 8px;
+  }
+
+  .live-dot {
+    width: 6px; height: 6px;
+    background: #000;
+    border-radius: 50%;
+    animation: blink 1s infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  /* ─── HERO ─── */
+  .hero {
+    position: relative;
+    padding: 72px 32px 56px;
+    max-width: 960px;
+    margin: 0 auto;
+    z-index: 1;
+  }
+
+  .hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface2);
+    border: 1px solid var(--border-light);
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--accent);
+    letter-spacing: 0.5px;
+    margin-bottom: 20px;
+  }
+
+  .hero h1 {
+    font-family: var(--font-head);
+    font-size: clamp(32px, 5vw, 52px);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -1.5px;
+    margin-bottom: 16px;
+  }
+
+  .hero h1 em {
+    font-style: normal;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero p {
+    font-size: 16.5px;
+    color: var(--muted);
+    max-width: 600px;
+    line-height: 1.7;
+    margin-bottom: 32px;
+    font-weight: 300;
+  }
+
+  /* ─── SEARCH BAR ─── */
+  .search-wrap {
+    position: relative;
+    max-width: 560px;
+    margin-bottom: 40px;
+  }
+
+  .search-icon {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    font-size: 16px;
+    pointer-events: none;
+  }
+
+  .search-input {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border-light);
+    border-radius: 10px;
+    padding: 14px 16px 14px 44px;
+    font-family: var(--font-body);
+    font-size: 14.5px;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .search-input::placeholder { color: var(--muted2); }
+
+  .search-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+  }
+
+  .search-btn {
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--accent);
+    color: #000;
+    border: none;
+    border-radius: 7px;
+    padding: 8px 18px;
+    font-family: var(--font-head);
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+
+  .search-btn:hover { opacity: 0.85; }
+
+  /* ─── STATS BAR ─── */
+  .stats-bar {
+    display: flex;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+
+  .stat {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .stat-num {
+    font-family: var(--font-head);
+    font-weight: 700;
+    font-size: 20px;
+    color: var(--text);
+  }
+
+  .stat-num span {
+    color: var(--accent);
+  }
+
+  .stat-label {
+    font-size: 12.5px;
+    color: var(--muted);
+    font-weight: 400;
+  }
+
+  /* ─── MAIN LAYOUT ─── */
+  main {
+    max-width: 1160px;
+    margin: 0 auto;
+    padding: 0 24px 80px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .section-header {
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .section-title {
+    font-family: var(--font-head);
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: -0.3px;
+  }
+
+  .see-all {
+    color: var(--accent);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: gap 0.2s;
+  }
+
+  .see-all:hover { gap: 8px; }
+
+  /* ─── CATEGORY GRID ─── */
+  .category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+    margin-bottom: 52px;
+  }
+
+  .cat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 16px;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: border-color 0.2s, background 0.2s, transform 0.15s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cat-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, var(--accent-glow), transparent 60%);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .cat-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .cat-card:hover::before { opacity: 1; }
+
+  .cat-icon {
+    width: 38px; height: 38px;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .cat-icon.cyan { background: rgba(0,229,255,0.12); }
+  .cat-icon.purple { background: rgba(123,92,240,0.15); }
+  .cat-icon.green { background: rgba(0,208,132,0.12); }
+  .cat-icon.gold { background: rgba(245,200,66,0.12); }
+  .cat-icon.red { background: rgba(255,77,109,0.12); }
+  .cat-icon.blue { background: rgba(66,153,225,0.12); }
+
+  .cat-info {}
+  .cat-name {
+    font-family: var(--font-head);
+    font-weight: 600;
+    font-size: 13.5px;
+    line-height: 1.2;
+    margin-bottom: 2px;
+  }
+  .cat-count {
+    font-size: 11.5px;
+    color: var(--muted);
+  }
+
+  /* ─── FILTERS ROW ─── */
+  .filters-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .filter-label {
+    font-size: 12.5px;
+    color: var(--muted);
+    font-weight: 500;
+    margin-right: 4px;
+  }
+
+  .filter-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 13px;
+    font-size: 12.5px;
+    font-family: var(--font-body);
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .filter-btn:hover, .filter-btn.active {
+    background: var(--surface2);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* ─── PRODUCT CARDS ─── */
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 16px;
+    margin-bottom: 52px;
+  }
+
+  .product-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 22px 22px 18px;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .product-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 40px rgba(0,229,255,0.07);
+  }
+
+  .product-card.featured {
+    border-color: var(--accent2);
+  }
+
+  .product-card.featured::after {
+    content: 'FEATURED';
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    background: var(--accent2);
+    color: #fff;
+    font-family: var(--font-head);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    padding: 3px 8px;
+    border-radius: 4px;
+  }
+
+  .product-top {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+
+  .product-logo {
+    width: 46px; height: 46px;
+    border-radius: 10px;
+    background: var(--surface2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+    border: 1px solid var(--border-light);
+  }
+
+  .product-meta {}
+  .product-name {
+    font-family: var(--font-head);
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 2px;
+    letter-spacing: -0.2px;
+  }
+
+  .product-platform {
+    font-size: 12px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .plat-tag {
+    background: var(--surface2);
+    border: 1px solid var(--border-light);
+    border-radius: 4px;
+    padding: 1px 7px;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .product-rating {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+
+  .stars {
+    color: var(--gold);
+    font-size: 13px;
+    letter-spacing: 1px;
+  }
+
+  .rating-num {
+    font-family: var(--font-head);
+    font-weight: 700;
+    font-size: 14px;
+  }
+
+  .rating-count {
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .product-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 14px;
+  }
+
+  .tag {
+    background: var(--surface2);
+    border: 1px solid var(--border-light);
+    border-radius: 5px;
+    padding: 3px 9px;
+    font-size: 11.5px;
+    color: var(--muted);
+  }
+
+  .tag.cyan { border-color: rgba(0,229,255,0.3); color: var(--accent); background: rgba(0,229,255,0.06); }
+  .tag.green { border-color: rgba(0,208,132,0.3); color: var(--green); background: rgba(0,208,132,0.06); }
+  .tag.purple { border-color: rgba(123,92,240,0.3); color: #a78bfa; background: rgba(123,92,240,0.07); }
+
+  .product-offer {
+    background: linear-gradient(90deg, rgba(0,229,255,0.07), rgba(123,92,240,0.07));
+    border: 1px solid var(--border-light);
+    border-radius: 8px;
+    padding: 10px 13px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .offer-text {
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+
+  .offer-price {
+    font-family: var(--font-head);
+    font-weight: 700;
+    font-size: 17px;
+    color: var(--text);
+  }
+
+  .offer-price .original {
+    font-size: 12px;
+    color: var(--muted2);
+    text-decoration: line-through;
+    font-weight: 400;
+    margin-right: 5px;
+  }
+
+  .offer-badge {
+    background: var(--green);
+    color: #000;
+    font-family: var(--font-head);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 5px;
+  }
+
+  .btn-get {
+    width: 100%;
+    margin-top: 13px;
+    background: transparent;
+    border: 1px solid var(--border-light);
+    border-radius: 7px;
+    padding: 10px;
+    font-family: var(--font-head);
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--text);
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    display: block;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+  }
+
+  .btn-get:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #000;
+  }
+
+  /* ─── COMPARISON TABLE ─── */
+  .compare-section { margin-bottom: 52px; }
+
+  .compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--surface);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+
+  .compare-table th {
+    background: var(--surface2);
+    padding: 13px 16px;
+    text-align: left;
+    font-family: var(--font-head);
+    font-weight: 600;
+    font-size: 12.5px;
+    color: var(--muted);
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .compare-table td {
+    padding: 14px 16px;
+    font-size: 13.5px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+
+  .compare-table tr:last-child td { border-bottom: none; }
+
+  .compare-table tr:hover td { background: var(--surface2); }
+
+  .check { color: var(--green); font-size: 15px; }
+  .cross { color: var(--red); font-size: 15px; }
+
+  .product-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .product-cell-icon {
+    width: 32px; height: 32px;
+    border-radius: 7px;
+    background: var(--surface2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    border: 1px solid var(--border-light);
+    flex-shrink: 0;
+  }
+
+  .product-cell-name {
+    font-family: var(--font-head);
+    font-size: 13.5px;
+    font-weight: 600;
+  }
+
+  /* ─── LISTS SECTION ─── */
+  .lists-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+    margin-bottom: 52px;
+  }
+
+  .list-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color 0.2s, transform 0.15s;
+  }
+
+  .list-card:hover { border-color: var(--accent2); transform: translateY(-2px); }
+
+  .list-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+
+  .list-card-title {
+    font-family: var(--font-head);
+    font-weight: 600;
+    font-size: 13px;
+    line-height: 1.3;
+  }
+
+  .list-card-arrow {
+    color: var(--muted2);
+    font-size: 14px;
+    transition: transform 0.2s, color 0.2s;
+  }
+
+  .list-card:hover .list-card-arrow {
+    transform: translateX(3px);
+    color: var(--accent);
+  }
+
+  .list-card-desc {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  /* ─── TESTIMONIALS ─── */
+  .testimonials-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 14px;
+    margin-bottom: 52px;
+  }
+
+  .testi-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+  }
+
+  .testi-stars { color: var(--gold); font-size: 12px; letter-spacing: 1px; margin-bottom: 10px; }
+
+  .testi-text {
+    font-size: 13.5px;
+    color: var(--text);
+    line-height: 1.65;
+    margin-bottom: 14px;
+    font-style: italic;
+    font-weight: 300;
+  }
+
+  .testi-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .testi-avatar {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-head);
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  .testi-name {
+    font-family: var(--font-head);
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .testi-handle {
+    font-size: 11.5px;
+    color: var(--muted);
+  }
+
+  /* ─── FAQ ─── */
+  .faq-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 52px;
+  }
+
+  .faq-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+
+  .faq-item:hover { border-color: var(--border-light); }
+
+  .faq-q {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 18px;
+    font-family: var(--font-head);
+    font-size: 14px;
+    font-weight: 600;
+    user-select: none;
+    gap: 12px;
+  }
+
+  .faq-chevron {
+    flex-shrink: 0;
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: var(--surface2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    color: var(--muted);
+    transition: transform 0.25s, background 0.2s;
+  }
+
+  .faq-item.open .faq-chevron {
+    transform: rotate(180deg);
+    background: var(--accent);
+    color: #000;
+  }
+
+  .faq-a {
+    display: none;
+    padding: 0 18px 15px;
+    font-size: 13.5px;
+    color: var(--muted);
+    line-height: 1.7;
+    font-weight: 300;
+    border-top: 1px solid var(--border);
+  }
+
+  .faq-item.open .faq-a { display: block; padding-top: 13px; }
+
+  /* ─── FOOTER ─── */
+  footer {
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+    padding: 40px 32px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .footer-inner {
+    max-width: 1160px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .footer-logo {
+    font-family: var(--font-head);
+    font-weight: 800;
+    font-size: 16px;
+    color: var(--text);
+  }
+
+  .footer-logo span { color: var(--accent); }
+
+  .footer-links {
+    display: flex;
+    gap: 22px;
+    flex-wrap: wrap;
+  }
+
+  .footer-links a {
+    font-size: 13px;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .footer-links a:hover { color: var(--text); }
+
+  .footer-copy {
+    font-size: 12px;
+    color: var(--muted2);
+  }
+
+  /* ─── UTILITIES ─── */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 0 0 48px;
+  }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 640px) {
+    nav { padding: 0 16px; }
+    .nav-links { display: none; }
+    .hero { padding: 48px 20px 40px; }
+    main { padding: 0 16px 60px; }
+    .products-grid { grid-template-columns: 1fr; }
+    .compare-table { display: none; }
+    footer { padding: 28px 20px; }
+    .footer-inner { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<!-- LIVE BANNER -->
+<div class="live-banner">
+  <span class="live-pill"><span class="live-dot"></span> LIVE</span>
+  NEW: Unified Smart Money Engine v2.0 now available for TradingView &amp; ThinkOrSwim — <strong>Save 30% this week</strong>
+</div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">
+    <span class="dot"></span>
+    Trade<span>Sniper</span>.ai
+  </a>
+  <ul class="nav-links">
+    <li><a href="#">Indicators</a></li>
+    <li><a href="#">Journal App</a></li>
+    <li><a href="#">Education</a></li>
+    <li><a href="#">Compare</a></li>
+    <li><a href="#">Reviews</a></li>
+  </ul>
+  <a href="#" class="nav-cta">Get Access →</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-eyebrow">
+    🎯 ICT &amp; SMC-Powered Tools
+  </div>
+  <h1>Discover the Best<br /><em>Smart Money</em> Tools<br />for Serious Traders</h1>
+  <p>Compare TradeSniper's institutional-grade indicators, journal apps, and educational resources. Built on ICT/SMC methodology — verified, tested, trusted by funded traders.</p>
+
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input class="search-input" type="text" placeholder="Search indicators, tools, or concepts…" />
+    <button class="search-btn">Search</button>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat">
+      <div class="stat-num">4<span>+</span></div>
+      <div class="stat-label">Products</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">2</div>
+      <div class="stat-label">Platforms</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">900<span>+</span></div>
+      <div class="stat-label">Lines of ThinkScript</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">100<span>%</span></div>
+      <div class="stat-label">ICT-Based</div>
+    </div>
+  </div>
+</section>
+
+<!-- MAIN -->
+<main>
+
+  <!-- BROWSE BY CATEGORY -->
+  <div class="section-header">
+    <h2 class="section-title">Browse by Category</h2>
+    <a href="#" class="see-all">View all →</a>
+  </div>
+
+  <div class="category-grid">
+    <a href="#" class="cat-card">
+      <div class="cat-icon cyan">📊</div>
+      <div class="cat-info">
+        <div class="cat-name">ThinkorSwim</div>
+        <div class="cat-count">2 tools</div>
+      </div>
+    </a>
+    <a href="#" class="cat-card">
+      <div class="cat-icon purple">📈</div>
+      <div class="cat-info">
+        <div class="cat-name">TradingView</div>
+        <div class="cat-count">2 tools</div>
+      </div>
+    </a>
+    <a href="#" class="cat-card">
+      <div class="cat-icon green">🗂️</div>
+      <div class="cat-info">
+        <div class="cat-name">Trade Journal</div>
+        <div class="cat-count">1 app</div>
+      </div>
+    </a>
+    <a href="#" class="cat-card">
+      <div class="cat-icon gold">📖</div>
+      <div class="cat-info">
+        <div class="cat-name">eBooks</div>
+        <div class="cat-count">1 guide</div>
+      </div>
+    </a>
+    <a href="#" class="cat-card">
+      <div class="cat-icon red">🎯</div>
+      <div class="cat-info">
+        <div class="cat-name">Order Blocks</div>
+        <div class="cat-count">3 tools</div>
+      </div>
+    </a>
+    <a href="#" class="cat-card">
+      <div class="cat-icon blue">⚡</div>
+      <div class="cat-info">
+        <div class="cat-name">Killzones</div>
+        <div class="cat-count">2 tools</div>
+      </div>
+    </a>
+    <a href="#" class="cat-card">
+      <div class="cat-icon cyan">🔄</div>
+      <div class="cat-info">
+        <div class="cat-name">BOS / CHoCH</div>
+        <div class="cat-count">2 tools</div>
+      </div>
+    </a>
+    <a href="#" class="cat-card">
+      <div class="cat-icon purple">📐</div>
+      <div class="cat-info">
+        <div class="cat-name">Fair Value Gaps</div>
+        <div class="cat-count">2 tools</div>
+      </div>
+    </a>
+    <a href="#" class="cat-card">
+      <div class="cat-icon green">🧠</div>
+      <div class="cat-info">
+        <div class="cat-name">AI Scoring</div>
+        <div class="cat-count">2 tools</div>
+      </div>
+    </a>
+    <a href="#" class="cat-card">
+      <div class="cat-icon gold">📱</div>
+      <div class="cat-info">
+        <div class="cat-name">Mobile Apps</div>
+        <div class="cat-count">1 app</div>
+      </div>
+    </a>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- PRODUCTS -->
+  <div class="section-header">
+    <h2 class="section-title">All TradeSniper Products</h2>
+    <a href="#" class="see-all">Compare all →</a>
+  </div>
+
+  <div class="filters-row">
+    <span class="filter-label">Filter:</span>
+    <button class="filter-btn active">All</button>
+    <button class="filter-btn">Indicators</button>
+    <button class="filter-btn">Apps</button>
+    <button class="filter-btn">Education</button>
+    <button class="filter-btn">ThinkorSwim</button>
+    <button class="filter-btn">TradingView</button>
+  </div>
+
+  <div class="products-grid">
+
+    <!-- Card 1 -->
+    <a href="#" class="product-card featured">
+      <div class="product-top">
+        <div class="product-logo">🎯</div>
+        <div class="product-meta">
+          <div class="product-name">Unified Smart Money Engine</div>
+          <div class="product-platform">
+            <span class="plat-tag">ThinkorSwim</span>
+            <span class="plat-tag">ThinkScript</span>
+          </div>
+        </div>
+      </div>
+      <div class="product-rating">
+        <span class="stars">★★★★★</span>
+        <span class="rating-num">4.9</span>
+        <span class="rating-count">(47 reviews)</span>
+      </div>
+      <div class="product-tags">
+        <span class="tag cyan">Order Blocks</span>
+        <span class="tag cyan">FVG</span>
+        <span class="tag green">BOS / CHoCH</span>
+        <span class="tag purple">AI Score</span>
+        <span class="tag">MTF Bias</span>
+        <span class="tag">Killzones</span>
+      </div>
+      <div class="product-offer">
+        <div>
+          <div class="offer-text">One-time license · v2.0</div>
+          <div class="offer-price"><span class="original">$97</span>$67</div>
+        </div>
+        <span class="offer-badge">30% OFF</span>
+      </div>
+      <span class="btn-get">Get Indicator →</span>
+    </a>
+
+    <!-- Card 2 -->
+    <a href="#" class="product-card">
+      <div class="product-top">
+        <div class="product-logo">📈</div>
+        <div class="product-meta">
+          <div class="product-name">Unified Smart Money Engine</div>
+          <div class="product-platform">
+            <span class="plat-tag">TradingView</span>
+            <span class="plat-tag">Pine Script v5</span>
+          </div>
+        </div>
+      </div>
+      <div class="product-rating">
+        <span class="stars">★★★★★</span>
+        <span class="rating-num">4.8</span>
+        <span class="rating-count">(31 reviews)</span>
+      </div>
+      <div class="product-tags">
+        <span class="tag cyan">Order Blocks</span>
+        <span class="tag cyan">FVG</span>
+        <span class="tag green">SMT Divergence</span>
+        <span class="tag purple">AI Score</span>
+        <span class="tag">ATR Stops</span>
+      </div>
+      <div class="product-offer">
+        <div>
+          <div class="offer-text">One-time license · v2.0</div>
+          <div class="offer-price"><span class="original">$97</span>$67</div>
+        </div>
+        <span class="offer-badge">30% OFF</span>
+      </div>
+      <span class="btn-get">Get Indicator →</span>
+    </a>
+
+    <!-- Card 3 -->
+    <a href="#" class="product-card">
+      <div class="product-top">
+        <div class="product-logo">🗂️</div>
+        <div class="product-meta">
+          <div class="product-name">SMC Trade Journal App</div>
+          <div class="product-platform">
+            <span class="plat-tag">Web App</span>
+            <span class="plat-tag">Mobile</span>
+          </div>
+        </div>
+      </div>
+      <div class="product-rating">
+        <span class="stars">★★★★★</span>
+        <span class="rating-num">4.9</span>
+        <span class="rating-count">(28 reviews)</span>
+      </div>
+      <div class="product-tags">
+        <span class="tag green">Journaling</span>
+        <span class="tag cyan">Pre-Trade Checklist</span>
+        <span class="tag purple">Analytics</span>
+        <span class="tag">Habit Tracking</span>
+      </div>
+      <div class="product-offer">
+        <div>
+          <div class="offer-text">Monthly subscription</div>
+          <div class="offer-price">$29<span style="font-size:12px;font-weight:400;color:var(--muted)">/mo</span></div>
+        </div>
+        <span class="offer-badge">14-day FREE</span>
+      </div>
+      <span class="btn-get">Try Free →</span>
+    </a>
+
+    <!-- Card 4 -->
+    <a href="#" class="product-card">
+      <div class="product-top">
+        <div class="product-logo">📖</div>
+        <div class="product-meta">
+          <div class="product-name">ICT/SMC Mastery Guide</div>
+          <div class="product-platform">
+            <span class="plat-tag">eBook</span>
+            <span class="plat-tag">PDF</span>
+          </div>
+        </div>
+      </div>
+      <div class="product-rating">
+        <span class="stars">★★★★☆</span>
+        <span class="rating-num">4.7</span>
+        <span class="rating-count">(62 reviews)</span>
+      </div>
+      <div class="product-tags">
+        <span class="tag cyan">ICT Concepts</span>
+        <span class="tag green">Beginner Friendly</span>
+        <span class="tag purple">SMC Roadmap</span>
+        <span class="tag">100+ Pages</span>
+      </div>
+      <div class="product-offer">
+        <div>
+          <div class="offer-text">Instant download</div>
+          <div class="offer-price">$19</div>
+        </div>
+        <span class="offer-badge">INSTANT</span>
+      </div>
+      <span class="btn-get">Buy eBook →</span>
+    </a>
+
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- COMPARE TABLE -->
+  <div class="compare-section">
+    <div class="section-header">
+      <h2 class="section-title">Product Comparison</h2>
+      <a href="#" class="see-all">Full comparison →</a>
+    </div>
+
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Platform</th>
+          <th>Order Blocks</th>
+          <th>FVG</th>
+          <th>AI Score</th>
+          <th>MTF Bias</th>
+          <th>Price</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <div class="product-cell">
+              <div class="product-cell-icon">🎯</div>
+              <div class="product-cell-name">USME — TOS</div>
+            </div>
+          </td>
+          <td>ThinkorSwim</td>
+          <td><span class="check">✓</span></td>
+          <td><span class="check">✓</span></td>
+          <td><span class="check">✓</span></td>
+          <td><span class="check">✓</span></td>
+          <td>$67</td>
+        </tr>
+        <tr>
+          <td>
+            <div class="product-cell">
+              <div class="product-cell-icon">📈</div>
+              <div class="product-cell-name">USME — TV</div>
+            </div>
+          </td>
+          <td>TradingView</td>
+          <td><span class="check">✓</span></td>
+          <td><span class="check">✓</span></td>
+          <td><span class="check">✓</span></td>
+          <td><span class="check">✓</span></td>
+          <td>$67</td>
+        </tr>
+        <tr>
+          <td>
+            <div class="product-cell">
+              <div class="product-cell-icon">🗂️</div>
+              <div class="product-cell-name">SMC Journal</div>
+            </div>
+          </td>
+          <td>Web / Mobile</td>
+          <td><span class="cross">—</span></td>
+          <td><span class="cross">—</span></td>
+          <td><span class="check">✓</span></td>
+          <td><span class="cross">—</span></td>
+          <td>$29/mo</td>
+        </tr>
+        <tr>
+          <td>
+            <div class="product-cell">
+              <div class="product-cell-icon">📖</div>
+              <div class="product-cell-name">ICT/SMC Guide</div>
+            </div>
+          </td>
+          <td>eBook</td>
+          <td><span class="check">✓</span></td>
+          <td><span class="check">✓</span></td>
+          <td><span class="cross">—</span></td>
+          <td><span class="check">✓</span></td>
+          <td>$19</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- TOOL LISTS -->
+  <div class="section-header">
+    <h2 class="section-title">Find Tools by Feature</h2>
+    <a href="#" class="see-all">All lists →</a>
+  </div>
+
+  <div class="lists-grid">
+    <a href="#" class="list-card">
+      <div class="list-card-head">
+        <span class="list-card-title">Tools with Order Block Detection</span>
+        <span class="list-card-arrow">→</span>
+      </div>
+      <div class="list-card-desc">Bullish and bearish OBs with mitigation tracking.</div>
+    </a>
+    <a href="#" class="list-card">
+      <div class="list-card-head">
+        <span class="list-card-title">Tools with Fair Value Gaps</span>
+        <span class="list-card-arrow">→</span>
+      </div>
+      <div class="list-card-desc">FVG detection with fill tracking across timeframes.</div>
+    </a>
+    <a href="#" class="list-card">
+      <div class="list-card-head">
+        <span class="list-card-title">Multi-Timeframe Bias</span>
+        <span class="list-card-arrow">→</span>
+      </div>
+      <div class="list-card-desc">HTF trend alignment for smarter entry filtering.</div>
+    </a>
+    <a href="#" class="list-card">
+      <div class="list-card-head">
+        <span class="list-card-title">Killzone Session Filters</span>
+        <span class="list-card-arrow">→</span>
+      </div>
+      <div class="list-card-desc">London, New York, and Asian session overlays.</div>
+    </a>
+    <a href="#" class="list-card">
+      <div class="list-card-head">
+        <span class="list-card-title">SMT Divergence Tools</span>
+        <span class="list-card-arrow">→</span>
+      </div>
+      <div class="list-card-desc">Smart money divergence vs correlated pairs.</div>
+    </a>
+    <a href="#" class="list-card">
+      <div class="list-card-head">
+        <span class="list-card-title">ATR-Based Risk Management</span>
+        <span class="list-card-arrow">→</span>
+      </div>
+      <div class="list-card-desc">Dynamic stops and targets based on volatility.</div>
+    </a>
+    <a href="#" class="list-card">
+      <div class="list-card-head">
+        <span class="list-card-title">BOS &amp; CHoCH Detection</span>
+        <span class="list-card-arrow">→</span>
+      </div>
+      <div class="list-card-desc">Break of Structure and Change of Character signals.</div>
+    </a>
+    <a href="#" class="list-card">
+      <div class="list-card-head">
+        <span class="list-card-title">AI Confluence Scoring</span>
+        <span class="list-card-arrow">→</span>
+      </div>
+      <div class="list-card-desc">Automated score weighing multiple ICT factors.</div>
+    </a>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- TESTIMONIALS -->
+  <div class="section-header">
+    <h2 class="section-title">Verified Trader Reviews</h2>
+    <a href="#" class="see-all">Read all →</a>
+  </div>
+
+  <div class="testimonials-grid">
+    <div class="testi-card">
+      <div class="testi-stars">★★★★★</div>
+      <p class="testi-text">"The USME indicator completely changed how I see price action. The AI confluence score alone is worth 10x the price — it filters out so many low-quality setups."</p>
+      <div class="testi-user">
+        <div class="testi-avatar">JR</div>
+        <div>
+          <div class="testi-name">Jordan R.</div>
+          <div class="testi-handle">Futures Trader · Apex Funded</div>
+        </div>
+      </div>
+    </div>
+    <div class="testi-card">
+      <div class="testi-stars">★★★★★</div>
+      <p class="testi-text">"I've tried 20+ ICT indicators and nothing comes close to how clean the OB + FVG combo is on TradeSniper. The killzone filter alone saves hours of screen time."</p>
+      <div class="testi-user">
+        <div class="testi-avatar">MT</div>
+        <div>
+          <div class="testi-name">Marcus T.</div>
+          <div class="testi-handle">Forex &amp; Indices · TradingView</div>
+        </div>
+      </div>
+    </div>
+    <div class="testi-card">
+      <div class="testi-stars">★★★★★</div>
+      <p class="testi-text">"The SMC eBook is the clearest breakdown of ICT concepts I've ever read — no fluff. I passed my prop evaluation the week after finishing it."</p>
+      <div class="testi-user">
+        <div class="testi-avatar">AK</div>
+        <div>
+          <div class="testi-name">Aisha K.</div>
+          <div class="testi-handle">Topstep Funded Trader</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- FAQ -->
+  <div class="section-header">
+    <h2 class="section-title">Frequently Asked Questions</h2>
+  </div>
+
+  <div class="faq-list">
+    <div class="faq-item" onclick="this.classList.toggle('open')">
+      <div class="faq-q">What platforms does TradeSniper support?<span class="faq-chevron">▾</span></div>
+      <div class="faq-a">TradeSniper currently offers indicators for ThinkorSwim (ThinkScript) and TradingView (Pine Script v5). The SMC Trade Journal App runs on web and mobile. We're actively working on additional platform support.</div>
+    </div>
+    <div class="faq-item" onclick="this.classList.toggle('open')">
+      <div class="faq-q">Is the Unified Smart Money Engine based on ICT concepts?<span class="faq-chevron">▾</span></div>
+      <div class="faq-a">Yes — 100%. The USME is built entirely on Inner Circle Trader (ICT) and Smart Money Concept (SMC) methodology, including Order Blocks, Fair Value Gaps, BOS/CHoCH, SMT Divergence, Killzones, and multi-timeframe bias alignment.</div>
+    </div>
+    <div class="faq-item" onclick="this.classList.toggle('open')">
+      <div class="faq-q">Can I use these tools with a prop firm account?<span class="faq-chevron">▾</span></div>
+      <div class="faq-a">Absolutely. Our indicators work on any standard ThinkorSwim or TradingView setup. Many of our users are funded prop traders using firms like Topstep, Apex, and MyFundedFutures.</div>
+    </div>
+    <div class="faq-item" onclick="this.classList.toggle('open')">
+      <div class="faq-q">Is there a free trial available?<span class="faq-chevron">▾</span></div>
+      <div class="faq-a">The SMC Trade Journal App comes with a 14-day free trial. Indicators are offered at a one-time price with a satisfaction guarantee — if you're not happy within 7 days, we'll make it right.</div>
+    </div>
+    <div class="faq-item" onclick="this.classList.toggle('open')">
+      <div class="faq-q">What is the AI Confluence Score?<span class="faq-chevron">▾</span></div>
+      <div class="faq-a">The AI Confluence Score is a proprietary weighted algorithm built into the USME that evaluates up to 10 ICT/SMC factors in real time — including OB quality, FVG presence, session timing, MTF alignment, and more — to produce a 0–100 score indicating setup strength.</div>
+    </div>
+  </div>
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">Trade<span>Sniper</span>.ai</div>
+    <div class="footer-links">
+      <a href="#">About</a>
+      <a href="#">Products</a>
+      <a href="#">Education</a>
+      <a href="#">Reviews</a>
+      <a href="#">Contact</a>
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms</a>
+    </div>
+    <div class="footer-copy">© 2026 TradeSniper.ai. All rights reserved.</div>
+  </div>
+</footer>
+
+<script>
+  // Filter buttons
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+
+  // Animate cards on scroll
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.style.opacity = '1';
+        e.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.product-card, .cat-card, .testi-card').forEach((el, i) => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(16px)';
+    el.style.transition = `opacity 0.4s ease ${i * 0.05}s, transform 0.4s ease ${i * 0.05}s, border-color 0.2s, box-shadow 0.2s`;
+    observer.observe(el);
+  });
+</script>
+</body>
+</html>
